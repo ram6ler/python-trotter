@@ -7,6 +7,8 @@ setup(
   author_email="rambler@ibwya.net",
   url="https://bitbucket.org/ram6ler/python_trotter",
   download_url="https://bitbucket.org/ram6ler/python_trotter/get/master.zip",
+  #packages=["trotter"],
+  py_modules=["trotter"],
   keywords=[
     "combinations", 
     "permutations", 
@@ -24,7 +26,6 @@ setup(
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering :: Mathematics"
   ],
-  packages=["trotter"],
   description="A set of classes that map integers to particular combinations, permutations and subsets of items.",
   long_description="""\
 .. image:: https://bitbucket.org/ram6ler/python_trotter/wiki/trotter_py.png
