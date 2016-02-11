@@ -556,10 +556,9 @@ class Compounds(_Combinatoric):
     
       >>> cp = Compounds("abcde")
       >>> len(cp)
-      TODO
+      326
       >>> cp[0:10]
-
-      TODO
+      ['', 'a', 'b', 'c', 'd', 'e', 'ab', 'ba', 'ac', 'ca']
       
     """
     
