@@ -28,7 +28,7 @@ Description: .. image:: https://bitbucket.org/ram6ler/python_trotter/wiki/trotte
         +------------+---------------+-------------+
        
         Also: Subsets and Compounds classes exist to represent combinations and permutations respectively
-        of unspecified length,        
+        of unspecified length.       
  
         Instances of these classes are indexable pseudo-lists containing all possible
         arrangements. Since the number of possible arrangements can grow very 

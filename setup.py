@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
   name="trotter",
-  version="0.5.0",
+  version="0.8.0",
   author="Richard Ambler",
   author_email="rambler@ibwya.net",
   url="https://bitbucket.org/ram6ler/python_trotter",
@@ -14,7 +14,9 @@ setup(
     "permutations", 
     "combinatorics", 
     "amalgams", 
-    "selections"
+    "selections",
+    "subsets",
+    "compounds"
   ],
   classifiers=[
     "Programming Language :: Python",
@@ -26,7 +28,7 @@ setup(
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering :: Mathematics"
   ],
-  description="A set of classes that map integers to particular combinations, permutations and subsets of items.",
+  description="A set of classes that map integers to particular combinations, permutations and subsets of items and vice versa.",
   long_description="""\
 .. image:: https://bitbucket.org/ram6ler/python_trotter/wiki/trotter_py.png
 
@@ -34,7 +36,7 @@ Welcome to trotter, a set of Python 3 classes for representing arrangements
 commonly encountered in combinatorics.
 
 Classes have been defined according to whether order is important and 
-whether items may be reused. The main classes supported are:
+whether items may be reused.
 
 +------------+---------------+-------------+
 |Class       |Order Important|Reuse Allowed|
@@ -48,14 +50,14 @@ whether items may be reused. The main classes supported are:
 |Combinations|No             |No           |
 +------------+---------------+-------------+
 
-Instances of these classes are indexable pseudo-lists containing all possible
-arrangements. Since the number of possible arrangements can grow very 
-quickly with the number of items available and the number of items taken at a
-time, instances do not actually store all arrangements but are rather
-containers mappings between integers and containers. This makes it
-possible to create instances that represent very large numbers of 
-arrangements.
+Also: Subsets and Compounds classes exist to represent combinations and permutations respectively of unspecified length.
 
+Instances of these classes are indexable pseudo-lists containing all possible arrangements. 
+Since the number of possible arrangements can grow very quickly with the number of items 
+available and the number of items taken at a time, instances do not actually store all 
+arrangements but are rather containers of mappings between integers and arrangements. This 
+makes it possible to create instances that "contain" very large numbers of arrangements.
+        
 For more information, please see the `trotter wiki <https://bitbucket.org/ram6ler/python_trotter/wiki/About.md>`_ .
 
 An example session:
