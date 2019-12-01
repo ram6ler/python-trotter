@@ -1,0 +1,7 @@
+README.md
+setup.py
+trotter.py
+trotter.egg-info/PKG-INFO
+trotter.egg-info/SOURCES.txt
+trotter.egg-info/dependency_links.txt
+trotter.egg-info/top_level.txt
