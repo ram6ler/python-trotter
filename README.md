@@ -1,103 +1,136 @@
-![](https://bitbucket.org/ram6ler/python_trotter/wiki/trotter_py.png)
+# Trotter
 
-Welcome to trotter, a set of Python 3 classes for representing arrangements
-of arrangements commonly encountered in combinatorics.
+Welcome to trotter, a set of Python classes for representing sequences
+of structures of item selections commonly encountered in combinatorics.
 
-Classes have been defined according to whether order is important, items may be repeated, and length is specified.
+Classes have been defined according to whether order is important, items may be repeated, and length is specified:
 
-|Class         |Order Important|Repetition Allowed|Specified Length|
-|:-------------|:-------------:|:----------------:|:--------------:|
-|`Amalgams`    |Yes            |Yes               |Yes             |
-|`Permutations`|Yes            |No                |Yes             |
-|`Compounds`   |Yes            |No                |No              |
-|`Compositions`|No             |Yes               |Yes             |
-|`Combinations`|No             |No                |Yes             |
-|`Subsets`     |No             |No                |No              |
+| Class          | Order Important | Repetition Allowed | Specified Length |
+| :------------- | :-------------: | :----------------: | :--------------: |
+| `Amalgams`     |       Yes       |        Yes         |       Yes        |
+| `Permutations` |       Yes       |         No         |       Yes        |
+| `Compounds`    |       Yes       |         No         |        No        |
+| `Compositions` |       No        |        Yes         |       Yes        |
+| `Combinations` |       No        |         No         |       Yes        |
+| `Subsets`      |       No        |         No         |        No        |
 
-Instances of these classes are indexable pseudo-lists containing all possible arrangements. Since the number of possible arrangements can grow very quickly with the number of items available (and the number of items taken at a time, where applicable), instances do not actually *store* all arrangements but are rather containers of *mappings between integers and arrangements*. This makes it possible to create instances that "contain" very large numbers of arrangements.
+Instances of these classes are indexable pseudo-lists containing all possible selections of items. Since the number of possible arrangements can grow very quickly with the number of items available (and the number of items taken at a time, where applicable), instances do not actually *store* all arrangements but are rather containers of *mappings between integers and arrangements*. This makes it possible to create instances that "contain" very large numbers of arrangements.
 
-For more information, please see the [trotter wiki](https://bitbucket.org/ram6ler/python_trotter/wiki/About.md).
+## Installation
 
-## Example session: pick three words
+```
+pip install trotter
+```
 
-```python
->>> # Import the Combinations class.
-... from trotter import *
->>> 
->>> # A list of words.
-... items = ["the", "parrot", "is", "not", "pining"]
->>>
->>> # A representation of 3-combinations of these words.
-... combos = Combinations(3, items)
->>>
->>> # Exactly what is c?
-... print(combos)
+## Example: combinations of words
+
+```py
+from trotter import Combinations
+
+items = ["the", "parrot", "is", "not", "pining"]
+combos = Combinations(3, items)
+
+print(repr(combos))
+```
+```
+Combinations(3, ['the', 'parrot', 'is', 'not', 'pining'])
+```
+```py
+print(str(combos))
+```
+```
 A pseudo-list containing 10 3-combinations of ['the', 'parrot', 'is', 'not', 'pining'].
->>> 
->>> # How many 3-combinations are there, again?
-... len(combos)
+```
+```py
+print(len(combos))
+```
+```
 10
->>> # Let's see them!
-... for combo in combos: 
-...   print(combo)
-... 
-['the', 'parrot', 'is']
-['the', 'parrot', 'not']
+```
+```py
+for combo in combos:
+    print(" ".join(combo))
+```
+```
+the parrot is
+the parrot not
+the parrot pining
+the is not
+the is pining
+the not pining
+parrot is not
+parrot is pining
+parrot not pining
+is not pining
+```
+```py
+print(combos.index("the parrot pining".split()))
+```
+```
+2
+```
+```py
+print(combos[2])
+```
+```
 ['the', 'parrot', 'pining']
-['the', 'is', 'not']
-['the', 'is', 'pining']
-['the', 'not', 'pining']
-['parrot', 'is', 'not']
-['parrot', 'is', 'pining']
-['parrot', 'not', 'pining']
-['is', 'not', 'pining']
 ```
 
-## Example session: subsets of letters in a string
+## Example: subsets of characters in a string
 
-```python
->>> # The items can also be the characters in a string.
-... items = "spam"
->>> # The subsets of the letters in this word
-... # (notice the first is the empty string):
-... for subset in Subsets(items):
-...   print(subset)
-... 
-s
-p
-sp
-a
-sa
-pa
-spa
-m
-sm
-pm
-spm
-am
-sam
-pam
-spam
+The items can be presented as a list of objects or a string, which is interpreted as a list of characters. Here's an example where we use a string.
+
+```text
+for i, subset in enumerate(Subsets("spam")):
+     print(f"[{i}] '{subset}'")
+```
+```
+[0] ''
+[1] 's'
+[2] 'p'
+[3] 'sp'
+[4] 'a'
+[5] 'sa'
+[6] 'pa'
+[7] 'spa'
+[8] 'm'
+[9] 'sm'
+[10] 'pm'
+[11] 'spm'
+[12] 'am'
+[13] 'sam'
+[14] 'pam'
+[15] 'spam'
 ```
 
-## Example session: a looooong pseudo-list!
+## Example: *many* permutations!
 
-```python
->>> # How many 10-permutations are there 
-... # of the 26 letters in the alphabet?
-... letters = "abcdefghijklmnopqrstuvwxyz"
->>> permutations = Permutations(10, letters)
->>> # Just how big is this list?
-... print(permutations)
-A pseudo-list containing 19275223968000 10-permutations of abcdefghijklmnopqrstuvwxyz.
->>> # Wow! Almost twenty trillion! Luckily it's only a
-... # pseudo-list and not really stored on the computer!
-... # The word "algorithms" is a ten-letter permutation of letters.
-... # What is the index of this word in the list of permutations?
-... permutations.index("algorithms")
+```py
+from trotter import Permutations
+letters = "abcdefghijklmnopqrstuvwxyz"
+permutations = Permutations(10, letters)
+print(permutations)
+```
+```
+A pseudo-list containing 19275223968000 10-permutations of 'abcdefghijklmnopqrstuvwxyz'.
+```
+
+That's almost twenty *trillion*! Luckily, we're only dealing with a pseudo-list, and those permutations are not actually stored!
+
+Notice that the word *algorithms* is a ten-letter permutation of the letters of the alphabet. At what position in the pseudo-list is this word?
+
+```py
+print(permutations.index("algorithms"))
+```
+```
 6831894769563
->>> # Found in a split second - take that, Mathematica!
->>> # Let's check:
-... print(permutations[6831894769563])
+```
+
+Luckily, we were able to find it without a brute-force search! Let's check that result...
+
+```py
+print(permutations[6831894769563])
+```
+```
 algorithms
 ```
