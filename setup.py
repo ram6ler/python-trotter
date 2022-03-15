@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="trotter",
-    version="1.0.1",
+    version="1.0.0",
     description="Pseudo-lists containing arrangements of item selection types that commonly arise in combinatorics, such as combinations, permutations and subsets.",
     long_description=(pathlib.Path(__file__).parent / "readme.md").read_text(),
     long_description_content_type="text/markdown",
@@ -29,5 +29,5 @@ setup(
         "Operating System :: OS Independent",
         "Topic :: Scientific/Engineering :: Mathematics",
     ],
-    python_requires=">=3.9",
+    python_requires=">=3.10",
 )

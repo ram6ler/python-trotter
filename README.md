@@ -80,7 +80,7 @@ print(combos[2])
 
 The items can be presented as a list of objects or a string, which is interpreted as a list of characters. Here's an example where we use a string.
 
-```text
+```py
 for i, subset in enumerate(Subsets("spam")):
      print(f"[{i}] '{subset}'")
 ```
