@@ -1,4 +1,20 @@
+from random import randint
 from .helpers import _adjusted_index, _arrangement
+
+
+def _fast_dice_roller(n: int) -> int:
+    # Uses Fast Dice Roller algorithm.
+    # See Lumbroso, J. (2012)
+    #   Optimal Discrete Uniform Generation from Coin Flips, and Applications.
+    v, c = 1, 0
+    while True:
+        v, c = 2 * v, 2 * c + randint(0, 1)
+        if v >= n:
+            if c < n:
+                return c
+            else:
+                v -= n
+                c -= n
 
 
 class Combinatoric:
@@ -24,6 +40,10 @@ class Combinatoric:
 
     def __contains__(self, arrangement: list) -> bool:
         raise NotImplementedError()
+
+    def random(self) -> list | str:
+        """A random combinatoric."""
+        return self[_fast_dice_roller(self._length)]
 
     def index(self, arrangement: list) -> int:
         raise NotImplementedError()
