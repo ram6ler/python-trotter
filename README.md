@@ -19,7 +19,7 @@ Instances of these classes are indexable pseudo-lists containing all possible se
 ## Installation
 
 ```
-pip install trotter
+pip install git+https://github.com/ram6ler/python-trotter
 ```
 
 ## Example: combinations of words
