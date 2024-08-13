@@ -1,8 +1,8 @@
 from random import randint
-from .helpers import _adjusted_index, _arrangement
+from .helpers import Arrangement, adjusted_index, fix_type
 
 
-def _fast_dice_roller(n: int) -> int:
+def fast_dice_roller(n: int) -> int:
     # Uses Fast Dice Roller algorithm.
     # See Lumbroso, J. (2012)
     #   Optimal Discrete Uniform Generation from Coin Flips, and Applications.
@@ -19,11 +19,13 @@ def _fast_dice_roller(n: int) -> int:
 
 class Combinatoric:
     """
-    The base class for the combinatorics classes. (Not meant for instantiation, but can be useful for typing and polymorphism.)
+    The base class for the combinatorics classes.
+
+    (Not meant for instantiation, but can be useful for typing and polymorphism.)
     """
 
     _r: int
-    _items: list | str
+    _elements: Arrangement
     _length: int
 
     def __init__(self):
@@ -35,38 +37,36 @@ class Combinatoric:
     def __iter__(self):
         return (self[i] for i in range(self._length))
 
-    def __getitem__(self, k: int | slice) -> list | str:
+    def __getitem__(self, k: int | slice) -> Arrangement:
         raise NotImplementedError()
 
     def __contains__(self, arrangement: list) -> bool:
         raise NotImplementedError()
 
-    def random(self) -> list | str:
+    def random(self) -> Arrangement:
         """A random combinatoric."""
-        return self[_fast_dice_roller(self._length)]
+        return self[fast_dice_roller(self._length)]
 
     def index(self, arrangement: list) -> int:
         raise NotImplementedError()
 
     def _str(self, name: str) -> str:
-        return _string(self, name)
+        return construct_string(self, name)
 
     def _repr(self, name) -> str:
-        return _representation(self, name)
+        return construct_representation(self, name)
 
     def _slice(self, s: slice):
-        start = 0 if s.start == None else _adjusted_index(s.start, self._length)
-        stop = self._length if s.stop == None else _adjusted_index(s.stop, self._length)
-        step = 1 if s.step == None else s.step
+        start = 0 if s.start is None else adjusted_index(s.start, self._length)
+        stop = self._length if s.stop is None else adjusted_index(s.stop, self._length)
+        step = 1 if s.step is None else s.step
 
-        return [
-            self[_adjusted_index(i, self._length)] for i in range(start, stop, step)
-        ]
+        return [self[adjusted_index(i, self._length)] for i in range(start, stop, step)]
 
 
-def _string(combinatoric: Combinatoric, name: str) -> str:
+def construct_string(combinatoric: Combinatoric, name: str) -> str:
     """A string summary of the Combinatoric."""
-    arrangement = _arrangement(combinatoric._items, combinatoric._items)
+    arrangement = fix_type(combinatoric._elements, combinatoric._elements)
     return "A pseudo-list containing {} {}-{} of {}.".format(
         combinatoric._length,
         combinatoric._r,
@@ -75,11 +75,11 @@ def _string(combinatoric: Combinatoric, name: str) -> str:
     )
 
 
-def _representation(combinatoric: Combinatoric, name: str) -> str:
+def construct_representation(combinatoric: Combinatoric, name: str) -> str:
     """A string representation of the Combinatoric."""
-    arrangement = _arrangement(
-        combinatoric._items,
-        combinatoric._items,
+    arrangement = fix_type(
+        combinatoric._elements,
+        combinatoric._elements,
     )
     return "{}({}, {})".format(
         name,

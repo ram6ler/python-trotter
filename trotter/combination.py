@@ -1,37 +1,39 @@
 from .helpers import (
-    _adjusted_index,
-    _arrangement,
-    _n_c_r,
-    _items_are_unique,
-    _items_exist_in_universal,
-    _combination,
-    _inverse_combination,
+    Arrangement,
+    adjusted_index,
+    fix_type,
+    ncr,
+    elements_are_unique,
+    elements_exist_in_universal,
+    combination,
+    inverse_combination,
 )
 from .combinatoric import Combinatoric
 
 
 class Combinations(Combinatoric):
-    """A pseudo-list containing combinations of items.
+    """
+    A pseudo-list containing combinations of elements.
 
     A combination is an arrangement in which order is not important and
     repetition is not allowed.
     """
 
-    def __init__(self, r: int, items: list | str):
+    def __init__(self, r: int, elements: Arrangement):
         self._r = r
-        self._items = items
-        self._length = _n_c_r(len(items), r)
+        self._elements = elements
+        self._length = ncr(len(elements), r)
 
-    def __getitem__(self, k: int | slice) -> list | str:
+    def __getitem__(self, k: int | slice) -> Arrangement:
         if isinstance(k, slice):
             return super()._slice(k)
         else:
-            dummy = _combination(
-                _adjusted_index(k, self._length),
+            dummy = combination(
+                adjusted_index(k, self._length),
                 self._r,
-                self._items,
+                self._elements,
             )
-            return _arrangement(self._items, dummy)
+            return fix_type(self._elements, dummy)
 
     def __repr__(self):
         return super()._repr("Combinations")
@@ -40,13 +42,16 @@ class Combinations(Combinatoric):
         return super()._str("combinations")
 
     def __contains__(self, combination: list) -> bool:
-        return _items_exist_in_universal(
-            combination, self._items
-        ) and _items_are_unique(combination)
+        return elements_exist_in_universal(
+            combination, self._elements
+        ) and elements_are_unique(combination)
 
     def index(self, combination: list) -> int:
         return (
-            _inverse_combination(combination, self._items)
+            inverse_combination(
+                combination,
+                self._elements,
+            )
             if combination in self
             else -1
         )

@@ -1,8 +1,10 @@
 from functools import wraps
 from typing import Callable
 
+type Arrangement = list | str
 
-def _cached(f: Callable[[int], int]) -> Callable[[int], int]:
+
+def cached(f: Callable[[int], int]) -> Callable[[int], int]:
     cache = dict[int, int]()
 
     @wraps(f)
@@ -14,270 +16,303 @@ def _cached(f: Callable[[int], int]) -> Callable[[int], int]:
     return wrapper
 
 
-@_cached
-def _fact(n: int) -> int:
-    """n!"""
+@cached
+def fact(n: int) -> int:
+    """
+    n!
+    """
     if n <= 1:
         return 1
-    return n * _fact(n - 1)
+    return n * fact(n - 1)
 
 
-def _n_p_r(n: int, r: int) -> int:
-    """Permutations count of r items taken from n."""
-    return _fact(n) // _fact(n - r)
+def npr(n: int, r: int) -> int:
+    """
+    Permutations count of r elements taken from n.
+    """
+    return fact(n) // fact(n - r)
 
 
-def _n_c_r(n: int, r: int) -> int:
-    """Combinations count of r items taken from n."""
-    return _n_p_r(n, r) // _fact(r)
+def ncr(n: int, r: int) -> int:
+    """
+    Combinations count of r elements taken from n.
+    """
+    return npr(n, r) // fact(r)
 
 
-def _sorted_arrangement(arrangement: list, items: list | str) -> list:
-    """Elements of arrangement ordered as they appear in items."""
+def sorted_elements(arrangement: list, elements: Arrangement) -> list:
+    """
+    Elements of `arrangement` ordered as they appear in `elements`.
+    """
     return sorted(
         arrangement,
-        key=lambda item: items.index(item),
+        key=lambda element: elements.index(element),
     )
 
 
-def _items_are_unique(items: list) -> bool:
-    """Whether elements in items are unique."""
-    return len(set(items)) == len(items)
+def elements_are_unique(elements: list) -> bool:
+    """
+    Whether elements in `elements` are unique.
+    """
+    return len(set(elements)) == len(elements)
 
 
-def _items_exist_in_universal(items: list, universal: list | str) -> bool:
-    """Whether elements in items are in universal."""
-    return all(item in universal for item in items)
+def elements_exist_in_universal(elements: list, universal: Arrangement) -> bool:
+    """
+    Whether elements in `elements` are in universal.
+    """
+    return all(element in universal for element in elements)
 
 
-def _arrangement(items: list | str, arrangement: list | str) -> list | str:
-    """A representation of arrangement based on the type of the items."""
-    return "".join(arrangement) if isinstance(items, str) else arrangement
+def fix_type(elements: Arrangement, arrangement: Arrangement) -> Arrangement:
+    """
+    A representation of `arrangement` based on the type of the `elements`.
+    """
+    return "".join(arrangement) if isinstance(elements, str) else arrangement
 
 
-def _permutation_worker(k: int, items: list) -> list:
-    """The kth Johnson-Trotter permutation of all items."""
-    n = len(items)
+def total_permutation(global_index: int, first_permutation: list) -> list:
+    """
+    The permutation at position `global_index` relative to `first_permutation`.
+    """
+    n = len(first_permutation)
     if n <= 1:
-        return items
+        return first_permutation
     else:
-        group = k // n
-        item = k % n
-        position = n - item - 1 if group % 2 == 0 else item
-        dummy = _permutation_worker(group, items[0 : (n - 1)])
-        dummy.insert(position, items[n - 1])
-        return dummy
+        partition_index = global_index // n
+        local_index = global_index % n
+        position = n - local_index - 1 if partition_index % 2 == 0 else local_index
+        *background_elements, pivot_element = first_permutation
+        background_permutation = total_permutation(
+            partition_index,
+            background_elements,
+        )
+        return [
+            *background_permutation[:position],
+            pivot_element,
+            *background_permutation[position:],
+        ]
 
 
-def _inverse_permutation_worker(permutation: list, items: list) -> int:
+def inverse_total_permutation(permutation: list, elements: list) -> int:
     """
-    The index of permutation in the Johnson-Trotter list of
-    permutations of elements in items.
+    The index of `permutation` in the Johnson-Trotter list of
+    permutations of the elements in `elements`.
     """
-    if len(permutation) == 1:
+    if len(permutation) == 0:
         return 0
     else:
-        n = len(items)
-        index = permutation.index(items[-1])
-        group = _inverse_permutation_worker(
-            [x for x in permutation if x != items[-1]],
-            items[0:(-1)],
+        n = len(elements)
+        *background_elements, pivot_element = elements
+        position = permutation.index(pivot_element)
+        partition_index = inverse_total_permutation(
+            [x for x in permutation if x != pivot_element],
+            background_elements,
         )
-        return n * group + (n - index - 1 if group % 2 == 0 else index)
+        local_index = n - 1 - position if partition_index % 2 == 0 else position
+        return n * partition_index + local_index
 
 
-def _amalgam(k: int, r: int, items: list | str) -> list:
-    """The kth permutation of r items taken from items."""
+def amalgam(k: int, r: int, elements: Arrangement) -> list:
+    """
+    The `k`th permutation of `r` elements taken from `elements`.
+    """
 
-    def element(i):
+    def element(i: int):
         nonlocal k
-        p = len(items) ** (r - i - 1)
+        p = len(elements) ** (r - i - 1)
         index = k // p
         k %= p
-        return items[index]
+        return elements[index]
 
     return [element(i) for i in range(r)]
 
 
-def _inverse_amalgam(amalgam: list, items: list | str) -> int:
+def inverse_amalgam(amalgam: list, elements: Arrangement) -> int:
     """
-    The index of amalgam in the ordered amalgams of
-    elements in items.
+    The index of `amalgam` in the ordered amalgams of elements in `elements`.
     """
     r = len(amalgam)
-    n = len(items)
-    powers = [n ** i for i in range(r)]
+    n = len(elements)
+    powers = [n**i for i in range(r)]
     return sum(
         [
-            items.index(amalgam[position]) * powers[r - position - 1]
+            elements.index(amalgam[position]) * powers[r - position - 1]
             for position in range(r)
         ]
     )
 
 
-def _combination(k: int, r: int, items: list | str) -> list:
-    """The kth combination of r elements taken from items."""
-    n = len(items)
+def combination(k: int, r: int, elements: Arrangement) -> list:
+    """
+    The `k`th combination of `r` elements taken from elements.
+    """
+    n = len(elements)
     position = 0
-    d = _n_c_r(n - position - 1, r - 1)
+    d = ncr(n - position - 1, r - 1)
 
     while k >= d:
         k -= d
         position += 1
-        d = _n_c_r(n - position - 1, r - 1)
+        d = ncr(n - position - 1, r - 1)
 
     if r == 0:
         return []
     else:
-        tail = items[(position + 1) :]
-        dummy = [items[position]]
-        dummy.extend(_combination(k, r - 1, tail))
+        tail = elements[(position + 1) :]
+        dummy = [elements[position]]
+        dummy.extend(combination(k, r - 1, tail))
         return dummy
 
 
-def _inverse_combination(combination: list, items: list | str) -> int:
+def inverse_combination(combination: list, elements: Arrangement) -> int:
     """
-    The index of combination in the ordered combinations of
-    elements in items.
+    The index of `combination` in the ordered combinations of elements in `elements`.
     """
 
-    def helper(combination, items):
+    def helper(combination: list, elements: Arrangement) -> int:
         if len(combination) == 0:
             return 0
         else:
             k = 0
             r = len(combination)
-            n = len(items)
-            item_index = 0
-            while combination[0] != items[item_index]:
-                k += _n_c_r(n - item_index - 1, r - 1)
-                item_index += 1
-            return k + helper(combination[1:], items[(item_index + 1) :])
+            n = len(elements)
+            element_index = 0
+            while combination[0] != elements[element_index]:
+                k += ncr(n - element_index - 1, r - 1)
+                element_index += 1
+            return k + helper(combination[1:], elements[(element_index + 1) :])
 
     return helper(
-        _sorted_arrangement(combination, items),
-        items,
+        sorted_elements(combination, elements),
+        elements,
     )
 
 
-def _permutation(k: int, r: int, items: list | str) -> list:
-    """The kth permutation of r elements taken from items."""
-    f = _fact(r)
-    group = k // f
-    item = k % f
-    comb = _combination(group, r, items)
-    return _permutation_worker(item, comb)
-
-
-def _inverse_permutation(permutation: list, items: list | str) -> int:
+def permutation(k: int, r: int, elements: Arrangement) -> list:
     """
-    The index of permutation in the ordered permutations of
-    elements in `items`.
+    The `k`th permutation of `r` elements taken from `elements`.
+    """
+    f = fact(r)
+    partition_index = k // f
+    local_index = k % f
+    comb = combination(partition_index, r, elements)
+    return total_permutation(local_index, comb)
+
+
+def inverse_permutation(permutation: list, elements: Arrangement) -> int:
+    """
+    The index of `permutation` in the ordered permutations of elements in `elements`.
     """
     r = len(permutation)
     if r == 0:
         return 0
     else:
-        sorted_permutation = _sorted_arrangement(permutation, items)
-        group = _inverse_combination(sorted_permutation, items)
-        return group * _fact(r) + _inverse_permutation_worker(
+        sorted_permutation = sorted_elements(permutation, elements)
+        group = inverse_combination(sorted_permutation, elements)
+        return group * fact(r) + inverse_total_permutation(
             permutation, sorted_permutation
         )
 
 
-def _composition(k: int, r: int, items: list | str):
-    """The kth selection of r elements taken from items."""
-    n = len(items)
+def composition(k: int, r: int, elements: Arrangement) -> list:
+    """
+    The `k`th composition of `r` elements taken from `elements`.
+    """
+    n = len(elements)
     position = 0
-    d = _n_c_r(n + r - position - 2, r - 1)
+    d = ncr(n + r - position - 2, r - 1)
 
     while k >= d:
         k -= d
         position += 1
-        d = _n_c_r(n + r - position - 2, r - 1)
+        d = ncr(n + r - position - 2, r - 1)
 
     if r == 0:
         return []
     else:
-        tail = items[position:]
-        dummy = [items[position]]
-        dummy.extend(_composition(k, r - 1, tail))
+        tail = elements[position:]
+        dummy = [elements[position]]
+        dummy.extend(composition(k, r - 1, tail))
         return dummy
 
 
-def _inverse_composition(composition: list, items: list | str) -> int:
+def inverse_composition(composition: list, elements: Arrangement) -> int:
     """
-    The index of composition in the ordered compositions of
-    elements in `items`.
+    The index of `composition` in the ordered compositions of elements in `elements`.
     """
 
-    def helper(composition, items):
+    def helper(composition: list, elements: Arrangement) -> int:
         if len(composition) == 0:
             return 0
         else:
             k = 0
-            n = len(items)
+            n = len(elements)
             r = len(composition)
-            item_index = 0
-            while composition[0] != items[item_index]:
-                k += _n_c_r(n + r - item_index - 2, r - 1)
-                item_index += 1
-            return k + helper(composition[1:], items[item_index:])
+            element_index = 0
+            while composition[0] != elements[element_index]:
+                k += ncr(n + r - element_index - 2, r - 1)
+                element_index += 1
+            return k + helper(composition[1:], elements[element_index:])
 
-    return helper(_sorted_arrangement(composition, items), items)
-
-
-def _subset(k: int, items: list | str) -> list:
-    """The kth subset of elements taken from items."""
-    return [items[i] for i in [j for j in range(len(items)) if k & (1 << j) != 0]]
+    return helper(sorted_elements(composition, elements), elements)
 
 
-def _inverse_subset(subset: list, items: list | str) -> int:
+def subset(k: int, elements: Arrangement) -> list:
     """
-    The index of subset in the ordered subsets of
-    elements in items.
+    The `k`th subset of elements taken from `elements`.
+    """
+    return [elements[i] for i in [j for j in range(len(elements)) if k & (1 << j) != 0]]
+
+
+def inverse_subset(subset: list, elements: Arrangement) -> int:
+    """
+    The index of `subset` in the ordered subsets of elements in `elements`.
     """
 
-    def helper(subset, items):
+    def helper(subset: list, elements: Arrangement) -> int:
         k = 0
-        n = len(items)
+        n = len(elements)
         power = 1
         for index in range(n):
-            if items[index] in subset:
+            if elements[index] in subset:
                 k += power
             power *= 2
         return k
 
     return helper(
-        _sorted_arrangement(list(set(subset)), items),
-        items,
+        sorted_elements(list(set(subset)), elements),
+        elements,
     )
 
 
-def _compound(k: int, items: list | str) -> list:
-    """The kth compound of elements taken from items."""
-    n = len(items)
+def compound(k: int, elements: Arrangement) -> list:
+    """
+    The `k`th compound of elements taken from `elements`.
+    """
+    n = len(elements)
     for r in range(n):
-        group_size = _n_p_r(n, r)
+        group_size = npr(n, r)
         if k >= group_size:
             k -= group_size
         else:
             break
     else:
         r += 1
-    return _permutation(k, r, items)
+    return permutation(k, r, elements)
 
 
-def _inverse_compound(compound, items):
+def inverse_compound(compound: list, elements: Arrangement):
     """
-    The index of compound in the ordered compounds of
-    elements in items.
+    The index of `compound` in the ordered compounds of elements in `elements`.
     """
-    n = len(items)
-    k = sum([_n_p_r(n, r) for r in range(len(compound))])
-    return k + _inverse_permutation(compound, items)
+    n = len(elements)
+    k = sum([npr(n, r) for r in range(len(compound))])
+    return k + inverse_permutation(compound, elements)
 
 
-def _adjusted_index(k: int, n: int) -> int:
-    """Index `k` mod `n` (for wraparound)."""
+def adjusted_index(k: int, n: int) -> int:
+    """
+    Index `k` mod `n` (for wraparound).
+    """
     return k % n

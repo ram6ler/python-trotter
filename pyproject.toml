@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=72.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "trotter"
+version = "1.2.0"
+authors = [
+  { name="Richard Ambler", email="rambler@wya.top" },
+]
+description = "Pseudo-lists containing arrangements of item selection types that commonly arise in combinatorics, such as combinations, permutations and subsets."
+readme = "README.md"
+license = {text = "MIT License"}
+requires-python = ">=3.12"
+classifiers = [
+    "Programming Language :: Python :: 3",
+        "Intended Audience :: Education",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+        "Topic :: Scientific/Engineering :: Mathematics",
+]
+keywords=[
+        "combinations",
+        "permutations",
+        "combinatorics",
+        "amalgams",
+        "compositions",
+        "subsets",
+        "compounds",
+    ]
+
+[project.urls]
+"Homepage" = "https://github.com/ram6ler/python-trotter"
+"Bug Tracker" = "https://github.com/ram6ler/python-trotter/issues"

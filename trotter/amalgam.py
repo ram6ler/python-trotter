@@ -1,35 +1,37 @@
 from .helpers import (
-    _arrangement,
-    _adjusted_index,
-    _items_exist_in_universal,
-    _amalgam,
-    _inverse_amalgam,
+    Arrangement,
+    fix_type,
+    adjusted_index,
+    elements_exist_in_universal,
+    amalgam,
+    inverse_amalgam,
 )
 from .combinatoric import Combinatoric
 
 
 class Amalgams(Combinatoric):
-    """A pseudo-list containing amalgams of items.
+    """
+    A pseudo-list containing amalgams of elements.
 
     An amalgam is an arrangement in which order is important and
     repetition is allowed.
     """
 
-    def __init__(self, r: int, items: list | str):
+    def __init__(self, r: int, elements: Arrangement):
         self._r = r
-        self._items = items
-        self._length = len(items) ** r
+        self._elements = elements
+        self._length = len(elements) ** r
 
-    def __getitem__(self, k: int | slice) -> list | str:
+    def __getitem__(self, k: int | slice) -> Arrangement:
         if isinstance(k, slice):
             return super()._slice(k)
         else:
-            dummy = _amalgam(
-                _adjusted_index(k, self._length),
+            dummy = amalgam(
+                adjusted_index(k, self._length),
                 self._r,
-                self._items,
+                self._elements,
             )
-            return _arrangement(self._items, dummy)
+            return fix_type(self._elements, dummy)
 
     def __repr__(self):
         return super()._repr("Amalgams")
@@ -38,7 +40,14 @@ class Amalgams(Combinatoric):
         return super()._str("amalgams")
 
     def __contains__(self, amalgam: list) -> bool:
-        return _items_exist_in_universal(amalgam, self._items)
+        return elements_exist_in_universal(amalgam, self._elements)
 
     def index(self, amalgam: list) -> int:
-        return _inverse_amalgam(amalgam, self._items) if amalgam in self else -1
+        return (
+            inverse_amalgam(
+                amalgam,
+                self._elements,
+            )
+            if amalgam in self
+            else -1
+        )

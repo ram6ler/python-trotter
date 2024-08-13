@@ -1,37 +1,39 @@
 from .helpers import (
-    _adjusted_index,
-    _arrangement,
-    _items_exist_in_universal,
-    _n_c_r,
-    _composition,
-    _inverse_composition,
+    Arrangement,
+    adjusted_index,
+    fix_type,
+    elements_exist_in_universal,
+    ncr,
+    composition,
+    inverse_composition,
 )
 
 from .combinatoric import Combinatoric
 
 
 class Compositions(Combinatoric):
-    """A pseudo-list containing compositions of items.
+    """
+    A pseudo-list containing compositions of elements.
 
     A composition is an arrangement in which order is not important and
     repetition is allowed.
     """
 
-    def __init__(self, r: int, items: list | str):
+    def __init__(self, r: int, elements: Arrangement):
         self._r = r
-        self._items = items
-        self._length = _n_c_r(len(items) + r - 1, r)
+        self._elements = elements
+        self._length = ncr(len(elements) + r - 1, r)
 
-    def __getitem__(self, k: int | slice) -> list | str:
+    def __getitem__(self, k: int | slice) -> Arrangement:
         if isinstance(k, slice):
             return super()._slice(k)
         else:
-            dummy = _composition(
-                _adjusted_index(k, self._length),
+            dummy = composition(
+                adjusted_index(k, self._length),
                 self._r,
-                self._items,
+                self._elements,
             )
-            return _arrangement(self._items, dummy)
+            return fix_type(self._elements, dummy)
 
     def __repr__(self):
         return super()._repr("Compositions")
@@ -40,7 +42,14 @@ class Compositions(Combinatoric):
         return super()._str("compositions")
 
     def __contains__(self, selection: list) -> bool:
-        return _items_exist_in_universal(selection, self._items)
+        return elements_exist_in_universal(selection, self._elements)
 
     def index(self, selection: list) -> int:
-        return _inverse_composition(selection, self._items) if selection in self else -1
+        return (
+            inverse_composition(
+                selection,
+                self._elements,
+            )
+            if selection in self
+            else -1
+        )
