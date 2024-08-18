@@ -8,5 +8,7 @@ from .combination import Combinations
 from .combinatoric import Combinatoric
 from .composition import Compositions
 from .compound import Compounds
+from .helpers import TrotterException
 from .permutation import Permutations
 from .subset import Subsets
+from .trotter import Trotter

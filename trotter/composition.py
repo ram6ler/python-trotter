@@ -6,6 +6,7 @@ from .helpers import (
     ncr,
     composition,
     inverse_composition,
+    raise_if_not_unique,
 )
 
 from .combinatoric import Combinatoric
@@ -23,6 +24,7 @@ class Compositions(Combinatoric):
         self._r = r
         self._elements = elements
         self._length = ncr(len(elements) + r - 1, r)
+        raise_if_not_unique(elements)
 
     def __getitem__(self, k: int | slice) -> Arrangement:
         if isinstance(k, slice):

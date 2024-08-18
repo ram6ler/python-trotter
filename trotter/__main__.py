@@ -6,6 +6,7 @@ from .composition import Compositions
 from .compound import Compounds
 from .permutation import Permutations
 from .subset import Subsets
+from .trotter import Trotter
 
 
 if __name__ == "__main__":
@@ -17,7 +18,9 @@ if __name__ == "__main__":
         except ValueError:
             print("Expecting integer k as first argument...")
             exit(1)
+
         elements = argv[2]
+
         if k < 0 or k > len(elements):
             print(
                 f"Expecting 0 ≤ k ≤ {len(elements)} "
@@ -30,7 +33,7 @@ if __name__ == "__main__":
     for C in Permutations, Combinations, Amalgams, Compositions:
         print()
         print(C)
-        cs = C(3, elements)
+        cs = C(k, elements)
         print(cs)
         for i, c in enumerate(cs):
             print(f"[{i}]".rjust(5) + f" {c} -> {cs.index(c)}")
@@ -42,3 +45,9 @@ if __name__ == "__main__":
         print(cs)
         for i, c in enumerate(cs):
             print(f"[{i}]".rjust(5) + f" {c}".rjust(6) + f" -> {cs.index(c)}")
+
+    print("\nTrotter:")
+    t = Trotter(elements)
+    for i in range(121):
+        print(f"[{str(i).rjust(3)}] {t}: {t.permutation}")
+        t.step()

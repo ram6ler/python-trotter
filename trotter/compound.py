@@ -7,6 +7,7 @@ from .helpers import (
     npr,
     compound,
     inverse_compound,
+    raise_if_not_unique,
 )
 
 from .combinatoric import Combinatoric
@@ -24,6 +25,7 @@ class Compounds(Combinatoric):
         n = len(elements)
         self._elements = elements
         self._length = sum([npr(n, r) for r in range(n + 1)])
+        raise_if_not_unique(elements)
 
     def __getitem__(self, k: int | slice) -> Arrangement:
         if isinstance(k, slice):

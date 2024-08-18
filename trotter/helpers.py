@@ -4,6 +4,14 @@ from typing import Callable
 type Arrangement = list | str
 
 
+class TrotterException(Exception):
+    def __init__(self, message: str) -> None:
+        self.message = message
+
+    def __str__(self) -> str:
+        return f"* Trotter Exception: {self.message}"
+
+
 def cached(f: Callable[[int], int]) -> Callable[[int], int]:
     cache = dict[int, int]()
 
@@ -57,6 +65,11 @@ def elements_are_unique(elements: list) -> bool:
     return len(set(elements)) == len(elements)
 
 
+def raise_if_not_unique(elements: Arrangement) -> None:
+    if not elements_are_unique(elements):
+        raise TrotterException(f"Elements {", ".join(elements)} expected to be unique.")
+
+
 def elements_exist_in_universal(elements: list, universal: Arrangement) -> bool:
     """
     Whether elements in `elements` are in universal.
@@ -68,7 +81,11 @@ def fix_type(elements: Arrangement, arrangement: Arrangement) -> Arrangement:
     """
     A representation of `arrangement` based on the type of the `elements`.
     """
-    return "".join(arrangement) if isinstance(elements, str) else arrangement
+    return (
+        "".join(arrangement)
+        if isinstance(elements, str)
+        else [element for element in arrangement]
+    )
 
 
 def total_permutation(global_index: int, first_permutation: list) -> list:

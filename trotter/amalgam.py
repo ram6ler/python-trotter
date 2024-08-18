@@ -5,6 +5,7 @@ from .helpers import (
     elements_exist_in_universal,
     amalgam,
     inverse_amalgam,
+    raise_if_not_unique,
 )
 from .combinatoric import Combinatoric
 
@@ -21,6 +22,7 @@ class Amalgams(Combinatoric):
         self._r = r
         self._elements = elements
         self._length = len(elements) ** r
+        raise_if_not_unique(elements)
 
     def __getitem__(self, k: int | slice) -> Arrangement:
         if isinstance(k, slice):

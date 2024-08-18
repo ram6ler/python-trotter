@@ -6,6 +6,7 @@ from .helpers import (
     elements_are_unique,
     subset,
     inverse_subset,
+    raise_if_not_unique,
 )
 from .combinatoric import Combinatoric
 
@@ -21,6 +22,7 @@ class Subsets(Combinatoric):
     def __init__(self, elements: Arrangement):
         self._elements = elements
         self._length = 1 << len(elements)
+        raise_if_not_unique(elements)
 
     def __getitem__(self, k: int | slice) -> Arrangement:
         if isinstance(k, slice):

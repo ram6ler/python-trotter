@@ -7,6 +7,7 @@ from .helpers import (
     elements_exist_in_universal,
     combination,
     inverse_combination,
+    raise_if_not_unique,
 )
 from .combinatoric import Combinatoric
 
@@ -23,6 +24,7 @@ class Combinations(Combinatoric):
         self._r = r
         self._elements = elements
         self._length = ncr(len(elements), r)
+        raise_if_not_unique(elements)
 
     def __getitem__(self, k: int | slice) -> Arrangement:
         if isinstance(k, slice):
